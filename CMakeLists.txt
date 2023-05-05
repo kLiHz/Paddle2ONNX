@@ -8,6 +8,7 @@ ADD_SUBDIRECTORY(paddle2onnx)
 option(WITH_STATIC              "Compile Paddle2ONNX with  STATIC"               OFF)
 option(PADDLE2ONNX_DEBUG "If open the debug log while converting model"          OFF)
 option(MSVC_STATIC_CRT          "Compile Paddle2ONNX with  MSVC STATIC CRT"               ON)
+option(BUILD_PADDLE2ONNX_EXE    "Build Paddle2ONNX executable"    OFF)
 set(ONNX_CUSTOM_PROTOC_PATH "" CACHE STRING "Set yourself Protobufc path")
 
 # Internal flags for convert.h.in
@@ -144,7 +145,9 @@ install(
 
 if (BUILD_PADDLE2ONNX_EXE)
   remove_definitions(-DPADDLE2ONNX_LIB)
+  find_package(Boost REQUIRED COMPONENTS program_options)
   ADD_EXECUTABLE(p2o_exec p2o_exec.cpp)
+  target_link_libraries(p2o_exec PRIVATE Boost::program_options paddle2onnx)
   if (WITH_STATIC)
     TARGET_LINK_LIBRARIES(p2o_exec -Wl,--whole-archive paddle2onnx -Wl,--no-whole-archive)
   else()
